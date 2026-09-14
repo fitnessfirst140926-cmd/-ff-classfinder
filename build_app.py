@@ -388,14 +388,47 @@ html = r"""<!DOCTYPE html>
     padding: 0 4px;
     cursor: pointer;
   }
+
+  .print-title {
+    display: none;
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; }
+    .no-print { display: none !important; }
+    .plan-remove { display: none !important; }
+    .print-title {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .print-subtitle {
+      display: block;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+    .plan-day-header { color: #000; border-bottom-color: #999; }
+    .plan-center-header { color: #000; }
+    .plan-session-row {
+      background: #fff;
+      border-color: #ccc;
+      break-inside: avoid;
+    }
+    .plan-session-info .t { color: #000; }
+    .plan-session-info .c { color: #000; }
+    .plan-session-info .i { color: #444; }
+    .results-count { color: #000; }
+  }
 </style>
 </head>
 <body>
 
-<h1>Class Finder</h1>
-<div class="subtitle">Find classes, or build a weekly schedule &middot; data as of __BUILD_DATE__</div>
+<h1 class="no-print">Class Finder</h1>
+<div class="subtitle no-print">Find classes, or build a weekly schedule &middot; data as of __BUILD_DATE__</div>
 
-<div class="section">
+<div class="section no-print">
   <div class="section-title">View</div>
   <div class="view-row">
     <div class="chip wide active" id="viewListBtn">List by day</div>
@@ -474,9 +507,14 @@ html = r"""<!DOCTYPE html>
 </div>
 
 <div id="planViewWrap" style="display:none;">
+  <div class="print-title" id="printTitle"></div>
   <div class="results-header">
     <div class="results-count" id="planResultsCount">--</div>
-    <span class="clear-link" id="planClear">clear plan</span>
+    <div class="no-print" style="display:flex; gap:2px;">
+      <span class="clear-link" id="planExportCsv">export csv</span>
+      <span class="clear-link" id="planPrint">print</span>
+      <span class="clear-link" id="planClear">clear plan</span>
+    </div>
   </div>
   <div id="planList"></div>
 </div>
@@ -590,6 +628,47 @@ document.getElementById('planClear').onclick = (e) => {
   state.plan.clear();
   savePlan();
   render();
+};
+
+// ---- Export plan: CSV download + print ----
+function csvEscape(val) {
+  const s = String(val ?? '');
+  if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function getPlanSessionsSorted() {
+  const dataByKey = {};
+  DATA.forEach(d => { dataByKey[d.key] = d; });
+  const sessions = [...state.plan].map(k => dataByKey[k]).filter(Boolean);
+  const dayIndex = d => DAYS.indexOf(d.day);
+  sessions.sort((a, b) => dayIndex(a) - dayIndex(b) || (a._startMin ?? 9999) - (b._startMin ?? 9999));
+  return sessions;
+}
+
+function exportPlanCsv() {
+  const sessions = getPlanSessionsSorted();
+  const header = ['Day', 'Center', 'Class', 'Start', 'End', 'Instructor'];
+  const rows = [header, ...sessions.map(s => [s.day, s.outlet, s.class, s.start || '', s.end || '', s.instructor || ''])];
+  const csvText = rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\ufeff' + csvText], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-fitness-plan.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+document.getElementById('planExportCsv').onclick = (e) => { e.stopPropagation(); exportPlanCsv(); };
+document.getElementById('planPrint').onclick = (e) => {
+  e.stopPropagation();
+  const today = new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
+  document.getElementById('printTitle').innerHTML =
+    `<div class="print-title">My Weekly Class Plan</div><div class="print-subtitle">Generated ${today}</div>`;
+  window.print();
 };
 
 // ---- Day chips ----
