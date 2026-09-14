@@ -506,7 +506,11 @@ function parseTimeToMinutes(t) {
   return h * 60 + min;
 }
 
-DATA.forEach((d, i) => { d._startMin = parseTimeToMinutes(d.start); d.id = i; });
+function planKey(d) {
+  return [d.outlet, d.day, d.start, d.class, d.instructor].join('|');
+}
+
+DATA.forEach((d, i) => { d._startMin = parseTimeToMinutes(d.start); d.id = i; d.key = planKey(d); });
 
 const jsDay = new Date().getDay(); // 0=Sun
 let state = {
@@ -538,29 +542,45 @@ viewWeekBtn.onclick = () => { state.view = 'week'; render(); };
 viewPlanBtn.onclick = () => { state.view = 'plan'; render(); };
 
 // ---- My Plan: add/remove + persistence ----
-function togglePlan(id) {
-  if (state.plan.has(id)) state.plan.delete(id);
-  else state.plan.add(id);
+// state.plan holds stable composite keys (outlet|day|start|class|instructor),
+// not array indices — so saved picks still match up correctly after the
+// weekly data refresh reshuffles DATA's order.
+const PLAN_STORAGE_KEY = 'ff-my-plan-v2';
+
+function togglePlan(key) {
+  if (state.plan.has(key)) state.plan.delete(key);
+  else state.plan.add(key);
   savePlan();
   render();
 }
 
 async function savePlan() {
+  const value = JSON.stringify([...state.plan]);
   try {
     if (window.storage) {
-      await window.storage.set('my-plan-v1', JSON.stringify([...state.plan]), false);
+      await window.storage.set(PLAN_STORAGE_KEY, value, false);
+      return;
     }
+  } catch (e) { /* fall through to localStorage */ }
+  try {
+    localStorage.setItem(PLAN_STORAGE_KEY, value);
   } catch (e) { /* best effort, not fatal */ }
 }
 
 async function loadPlan() {
   try {
     if (window.storage) {
-      const res = await window.storage.get('my-plan-v1', false);
+      const res = await window.storage.get(PLAN_STORAGE_KEY, false);
       if (res && res.value) {
-        JSON.parse(res.value).forEach(id => state.plan.add(id));
+        JSON.parse(res.value).forEach(k => state.plan.add(k));
+        render();
+        return;
       }
     }
+  } catch (e) { /* no saved plan yet via window.storage, try localStorage */ }
+  try {
+    const raw = localStorage.getItem(PLAN_STORAGE_KEY);
+    if (raw) JSON.parse(raw).forEach(k => state.plan.add(k));
   } catch (e) { /* no saved plan yet, or storage unavailable */ }
   render();
 }
@@ -733,18 +753,22 @@ function sortResults(arr) {
   return arr;
 }
 
-function classCardHtml(d) {
-  const inPlan = state.plan.has(d.id);
-  return `
+function buildClassCard(d) {
+  const inPlan = state.plan.has(d.key);
+  const card = document.createElement('div');
+  card.className = 'class-card';
+  card.innerHTML = `
       <div class="class-top">
         <div class="class-name">${escapeHtml(d.class)}</div>
         <div class="class-time">${d.start ? d.start + ' - ' + d.end : ''}</div>
       </div>
       <div class="class-meta">${escapeHtml(d.outlet)}${d.instructor ? ' · ' + escapeHtml(d.instructor) : ''}</div>
       <div style="margin-top:8px; display:flex; justify-content:flex-end;">
-        <button class="plan-btn${inPlan ? ' in-plan' : ''}" onclick="togglePlan(${d.id})">${inPlan ? '✓ In plan' : '+ Add to plan'}</button>
+        <button class="plan-btn${inPlan ? ' in-plan' : ''}">${inPlan ? '✓ In plan' : '+ Add to plan'}</button>
       </div>
     `;
+  card.querySelector('.plan-btn').addEventListener('click', () => togglePlan(d.key));
+  return card;
 }
 
 function renderListView() {
@@ -766,10 +790,7 @@ function renderListView() {
     const dayLabel = distinctDays[0] || '';
     document.getElementById('resultsCount').textContent = results.length + (results.length === 1 ? ' class' : ' classes') + (dayLabel ? ' on ' + dayLabel : '');
     results.forEach(d => {
-      const card = document.createElement('div');
-      card.className = 'class-card';
-      card.innerHTML = classCardHtml(d);
-      list.appendChild(card);
+      list.appendChild(buildClassCard(d));
     });
   } else {
     document.getElementById('resultsCount').textContent = results.length + ' classes across ' + distinctDays.length + ' days';
@@ -780,10 +801,7 @@ function renderListView() {
       header.textContent = day + ' · ' + dayResults.length + (dayResults.length === 1 ? ' class' : ' classes');
       list.appendChild(header);
       dayResults.forEach(d => {
-        const card = document.createElement('div');
-        card.className = 'class-card';
-        card.innerHTML = classCardHtml(d);
-        list.appendChild(card);
+        list.appendChild(buildClassCard(d));
       });
     });
   }
@@ -858,9 +876,10 @@ function renderWeekView() {
       if (sessions && sessions.length) {
         sessions.forEach(s => {
           const slot = document.createElement('div');
-          const inPlan = state.plan.has(s.id);
+          const inPlan = state.plan.has(s.key);
           slot.className = 'week-slot';
-          slot.innerHTML = `<span class="t">${s.start ? s.start + '-' + s.end : ''}</span><span class="c">${escapeHtml(s.class)}</span>${s.instructor ? '<span class="i">' + escapeHtml(s.instructor) + '</span>' : ''}<button class="plan-btn${inPlan ? ' in-plan' : ''}" onclick="togglePlan(${s.id})">${inPlan ? '✓' : '+ plan'}</button>`;
+          slot.innerHTML = `<span class="t">${s.start ? s.start + '-' + s.end : ''}</span><span class="c">${escapeHtml(s.class)}</span>${s.instructor ? '<span class="i">' + escapeHtml(s.instructor) + '</span>' : ''}<button class="plan-btn${inPlan ? ' in-plan' : ''}">${inPlan ? '✓' : '+ plan'}</button>`;
+          slot.querySelector('.plan-btn').addEventListener('click', () => togglePlan(s.key));
           td.appendChild(slot);
         });
       }
@@ -872,8 +891,9 @@ function renderWeekView() {
 }
 
 function renderPlanView() {
-  const ids = [...state.plan];
-  const sessions = ids.map(id => DATA[id]).filter(Boolean);
+  const dataByKey = {};
+  DATA.forEach(d => { dataByKey[d.key] = d; });
+  const sessions = [...state.plan].map(k => dataByKey[k]).filter(Boolean);
   const list = document.getElementById('planList');
   list.innerHTML = '';
 
@@ -912,8 +932,9 @@ function renderPlanView() {
             <span class="t">${s.start ? s.start + '-' + s.end : ''}</span><span class="c">${escapeHtml(s.class)}</span>
             ${s.instructor ? '<span class="i">' + escapeHtml(s.instructor) + '</span>' : ''}
           </div>
-          <div class="plan-remove" onclick="togglePlan(${s.id})">✕</div>
+          <div class="plan-remove">✕</div>
         `;
+        row.querySelector('.plan-remove').addEventListener('click', () => togglePlan(s.key));
         list.appendChild(row);
       });
     });
