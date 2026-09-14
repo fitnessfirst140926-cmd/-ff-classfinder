@@ -1,0 +1,59 @@
+{
+  "isSuccess": true,
+  "messages": ["Ok"],
+  "data": {
+    "timetable": [
+      {
+        "dayShort": "Mon",
+        "formattedDate": "14/9",
+        "isToday": true,
+        "morning": [
+          {
+            "classId": "1",
+            "title": "GENTLE FLOW YOGA",
+            "timeText": "07:15am - 08:15am",
+            "duration": "60",
+            "clubName": "100AM (Tanjong Pagar)",
+            "instructor": "Ian Fung ."
+          }
+        ],
+        "afternoon": [
+          {
+            "classId": "210",
+            "title": "BODYCOMBAT\u00ae",
+            "timeText": "12:00pm - 01:00pm",
+            "duration": "60",
+            "clubName": "100AM (Tanjong Pagar)",
+            "instructor": "Kenneth Tan ."
+          }
+        ],
+        "evening": [
+          {
+            "classId": "754",
+            "title": "HYROX FOUNDATIONAL",
+            "timeText": "06:30pm - 07:15pm",
+            "duration": "45",
+            "clubName": "100AM (Tanjong Pagar)",
+            "instructor": "Ryan Gan ."
+          },
+          {
+            "classId": "999",
+            "title": "SOME CLASS WITH NO DOT",
+            "timeText": "08:00pm - 09:00pm",
+            "duration": "60",
+            "clubName": "100AM (Tanjong Pagar)",
+            "instructor": "Jia Yang Chan"
+          }
+        ]
+      },
+      {
+        "dayShort": "Tue",
+        "formattedDate": "15/9",
+        "isToday": false,
+        "morning": [],
+        "afternoon": [],
+        "evening": []
+      }
+    ]
+  }
+}
