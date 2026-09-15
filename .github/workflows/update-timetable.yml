@@ -2,9 +2,9 @@ name: Update Fitness First timetable
 
 on:
   schedule:
-    # Every Monday at 03:00 UTC (11:00am Singapore time)
-    - cron: "0 3 * * 1"
-  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+    - cron: '30 0 * * *'   # 8:30am SGT daily
+  workflow_dispatch:        # optional: lets you trigger it manually too
+
 
 permissions:
   contents: write
