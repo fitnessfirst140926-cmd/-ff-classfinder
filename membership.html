@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness First — Membership Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #10171A;
+    --panel: #182228;
+    --panel-raised: #1F2B32;
+    --line: #2A3941;
+    --text: #EDF3F0;
+    --text-dim: #9CB0AC;
+    --accent: #E8FF6B;
+    --accent-dim: #B8CC55;
+    --good: #7FE3A3;
+    --warn: #FFB86B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:40px;
+  }
+  .wrap{
+    max-width:560px;
+    margin:0 auto;
+    padding:0 18px;
+  }
+  header{
+    padding:28px 18px 18px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  header .eyebrow{
+    font-size:13px;
+    color:var(--accent);
+    font-weight:600;
+    letter-spacing:0.02em;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:26px;
+    font-weight:700;
+    margin:6px 0 4px;
+    line-height:1.15;
+  }
+  .sub{
+    color:var(--text-dim);
+    font-size:14px;
+    line-height:1.5;
+    max-width:48ch;
+    margin-bottom:18px;
+  }
+  nav{
+    display:flex;
+    gap:8px;
+  }
+  nav button{
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text-dim);
+    font-family:'Inter', sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  nav button.active{
+    border-color:var(--accent);
+    background:var(--panel-raised);
+    color:var(--accent);
+  }
+  .page{ display:none; }
+  .page.active{ display:block; }
+
+  .group{ margin-bottom:22px; }
+  .group-label{
+    font-size:13px;
+    color:var(--text-dim);
+    margin-bottom:10px;
+    font-weight:500;
+  }
+  .pillrow{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{
+    flex:1 1 auto;
+    min-width:max-content;
+    padding:11px 16px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    transition:border-color 0.15s, background 0.15s;
+    text-align:center;
+  }
+  .pill.active{
+    border-color:var(--accent);
+    background:var(--panel-raised);
+    color:var(--accent);
+  }
+  .pill:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  select{
+    width:100%;
+    padding:13px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    appearance:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239CB0AC' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+  }
+  select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:13px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    margin-bottom:10px;
+  }
+  .toggle-row .label{ font-size:14px; }
+  .toggle-row .label .note{
+    display:block;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+  .switch{ position:relative; width:42px; height:24px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{
+    position:absolute; cursor:pointer; inset:0;
+    background:var(--line); border-radius:24px; transition:0.15s;
+  }
+  .slider:before{
+    content:""; position:absolute; height:18px; width:18px;
+    left:3px; top:3px; background:var(--text-dim);
+    border-radius:50%; transition:0.15s;
+  }
+  input:checked + .slider{ background:var(--accent-dim); }
+  input:checked + .slider:before{ transform:translateX(18px); background:var(--bg); }
+  .stepper{ display:flex; align-items:center; gap:14px; }
+  .stepper button{
+    width:36px; height:36px; border-radius:8px;
+    border:1px solid var(--line); background:var(--panel);
+    color:var(--text); font-size:18px; cursor:pointer; line-height:1;
+  }
+  .stepper button:active{ background:var(--panel-raised); }
+  .stepper .count{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:18px; min-width:24px; text-align:center;
+  }
+  .subrow{
+    display:flex;
+    gap:8px;
+    margin-top:-2px;
+    margin-bottom:10px;
+  }
+  .subrow select{ flex:1; }
+
+  .result{
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 20px;
+    margin-top:26px;
+  }
+  .result .plan-name{ font-size:13px; color:var(--text-dim); margin-bottom:4px; }
+  .result .big{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:42px; font-weight:700; line-height:1;
+    color:var(--accent);
+    display:flex; align-items:baseline; gap:6px;
+  }
+  .result .big .permo{
+    font-size:15px; color:var(--text-dim); font-weight:400;
+    font-family:'Inter', sans-serif;
+  }
+  .breakdown{ margin-top:16px; border-top:1px solid var(--line); padding-top:14px; }
+  .breakdown .row{
+    display:flex; justify-content:space-between;
+    font-size:13.5px; padding:5px 0; color:var(--text-dim);
+  }
+  .breakdown .row.total{
+    color:var(--text); font-weight:600;
+    border-top:1px solid var(--line); margin-top:6px; padding-top:10px;
+  }
+  .flag{
+    margin-top:14px; padding:10px 12px;
+    background:rgba(255,184,107,0.1);
+    border:1px solid rgba(255,184,107,0.3);
+    border-radius:8px; font-size:12.5px; color:var(--warn); line-height:1.5;
+  }
+  .commit-total{ margin-top:16px; border-top:1px solid var(--line); padding-top:14px; }
+  .commit-total .row{
+    display:flex; justify-content:space-between;
+    font-size:13.5px; padding:5px 0; color:var(--text-dim);
+  }
+  .commit-total .row.total{
+    color:var(--text); font-weight:600;
+    border-top:1px solid var(--line); margin-top:6px; padding-top:10px;
+  }
+  footer{
+    margin-top:28px; font-size:12px; color:var(--text-dim);
+    line-height:1.6; padding-top:16px; border-top:1px solid var(--line);
+  }
+
+  /* Notes page */
+  .note-section{
+    margin-bottom:28px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--line);
+  }
+  .note-section:last-of-type{ border-bottom:none; }
+  .note-section h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--accent);
+    margin:0 0 12px;
+  }
+  .note-section h3{
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    margin:14px 0 6px;
+  }
+  .note-section p{
+    font-size:14px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin:0 0 8px;
+  }
+  .note-section ul{
+    margin:0 0 8px;
+    padding-left:18px;
+  }
+  .note-section li{
+    font-size:14px;
+    color:var(--text-dim);
+    line-height:1.7;
+  }
+  .note-section li b, .note-section p b{ color:var(--text); }
+  .note-section .callout{
+    margin-top:10px;
+    padding:10px 12px;
+    background:rgba(232,255,107,0.06);
+    border:1px solid rgba(232,255,107,0.25);
+    border-radius:8px;
+    font-size:13px;
+    color:var(--accent-dim);
+    line-height:1.55;
+  }
+  .note-section .warncallout{
+    margin-top:10px;
+    padding:10px 12px;
+    background:rgba(255,184,107,0.1);
+    border:1px solid rgba(255,184,107,0.3);
+    border-radius:8px;
+    font-size:13px;
+    color:var(--warn);
+    line-height:1.55;
+  }
+  .qa{
+    counter-reset: qcounter;
+  }
+  .qa li{
+    list-style:none;
+    counter-increment: qcounter;
+    position:relative;
+    padding-left:22px;
+    margin-bottom:10px;
+  }
+  .qa li:before{
+    content: counter(qcounter) ".";
+    position:absolute;
+    left:0;
+    color:var(--accent-dim);
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Fitness First SG</div>
+    <h1>Membership Guide</h1>
+    <div class="sub">Cost calculator and full notes, compiled from gym contacts &amp; consultants — Sept 2026.</div>
+    <nav>
+      <button class="active" data-page="calculator">Calculator</button>
+      <button data-page="notes">Full Notes</button>
+    </nav>
+    <a href="index.html" style="display:inline-block; margin-top:12px; font-size:13px; color:var(--text-dim); text-decoration:none;">&larr; Back to Class Finder</a>
+  </header>
+
+  <!-- ============ CALCULATOR PAGE ============ -->
+  <div class="page active" id="page-calculator">
+
+    <div class="group">
+      <div class="group-label">Payment route</div>
+      <div class="pillrow" id="route-pills">
+        <button class="pill active" data-route="monthly">Monthly plan</button>
+        <button class="pill" data-route="lumpsum">Lumpsum prepaid</button>
+      </div>
+    </div>
+
+    <div id="monthly-controls">
+      <div class="group">
+        <div class="group-label">Rate tier</div>
+        <select id="tier-select">
+          <option value="standard-4">Standard — 4 months ($250/mo)</option>
+          <option value="standard-12" selected>Standard — 12 months ($225/mo)</option>
+          <option value="standard-18">Standard — 18 months ($215/mo)</option>
+          <option value="standard-24">Standard — 24 months ($205/mo)</option>
+          <option value="corp-ge">Corporate Partnership / Great Eastern — 12mo ($214/mo)</option>
+          <option value="insurer-205">Prudential / Manulife / AIA (no Vitality) / AIG / NTUC Income — 12mo ($205/mo)</option>
+          <option value="vitality-12">AIA with Vitality — 12mo ($203/mo)</option>
+          <option value="vitality-24">AIA with Vitality — 24mo ($180/mo)</option>
+        </select>
+      </div>
+
+      <div class="group" id="vitality-toggle-group" style="display:none;">
+        <div class="toggle-row">
+          <div class="label">Include Vitality subscription
+            <span class="note">$8/mo, separate from gym fee — required for the Vitality rate</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="vitality-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="flag" style="margin-top:0;">Oct/Nov $95 promo pricing is standalone and can't be stacked with the 30-day (PT) or 14-day sign-up promos below.</div>
+      </div>
+
+      <div class="group">
+        <div class="toggle-row">
+          <div class="label">Add PT sessions
+            <span class="note">One-time — unlocks 30 days free, stacks with 14-day promo</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="pt-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="pt-options" style="display:none;">
+          <div class="pillrow">
+            <button class="pill active" data-pt="199">3x sessions — $199</button>
+            <button class="pill" data-pt="349">6x sessions — $349</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="toggle-row">
+          <div class="label">Sign up by 30 Sept 2026
+            <span class="note">+14 days free — stacks with PT promo above</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="promo14-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Planned freeze months</div>
+        <div class="stepper">
+          <button id="freeze-minus">–</button>
+          <div class="count" id="freeze-count">0</div>
+          <button id="freeze-plus">+</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="toggle-row">
+          <div class="label">Add locker rental
+            <span class="note">$36 deposit, refunded after minimum term</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="locker-toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="locker-options" style="display:none;">
+          <div class="subrow">
+            <select id="locker-size">
+              <option value="small">Small</option>
+              <option value="large">Large</option>
+            </select>
+            <select id="locker-term">
+              <option value="mb">6-mo min. commitment</option>
+              <option value="nomb">No commitment</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="lumpsum-controls" style="display:none;">
+      <div class="group">
+        <div class="group-label">Prepaid package</div>
+        <select id="lumpsum-select">
+          <option value="6-1">6 + 1 months free — $1,350 total (7 months)</option>
+          <option value="12-3" selected>12 + 3 months free — $2,700 total (15 months)</option>
+          <option value="family">Family add-on — $2,400 (15 months)</option>
+          <option value="paragon">Paragon outlet only — $2,520</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="plan-name" id="result-label">Standard — 12 months</div>
+      <div class="big"><span id="result-monthly">$225</span><span class="permo">/month</span></div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="commit-total" id="commit-total"></div>
+      <div class="flag" id="flag-box" style="display:none;"></div>
+    </div>
+
+    <footer>
+      Figures compiled from handwritten notes and messages from gym contacts, Sept 2026. Promo pricing valid until 30 Sept 2026 — reconfirm with the club before committing. Prudential's rate has appeared as both $205 and $214 across sources; unresolved — see Full Notes.
+    </footer>
+  </div>
+
+  <!-- ============ NOTES PAGE ============ -->
+  <div class="page" id="page-notes">
+
+    <div class="note-section">
+      <h2>All-club access includes</h2>
+      <p>Full access to all FF clubs · machines &amp; equipment · unlimited group ex classes · SEA FF clubs overseas · complimentary attire (except Tampines &amp; Junction 10) · body wash &amp; shampoo · pool, steam room &amp; sauna · ice bath &amp; recovery zone · RFID lockers, hair dryers &amp; straighteners</p>
+    </div>
+
+    <div class="note-section">
+      <h2>Standard Platinum rates</h2>
+      <ul>
+        <li>4 months — <b>$250/mo</b></li>
+        <li>12 months — <b>$225/mo</b></li>
+        <li>18 months — <b>$215/mo</b></li>
+        <li>24 months — <b>$205/mo</b></li>
+        <li>No upfront admin fee</li>
+        <li>Payment auto-deducted via credit card, on the 1st of each month</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Insurance / corporate partner plans</h2>
+      <p>12-month commitment · 14 clubs nationwide · unlimited classes + amenities</p>
+      <h3>AIA with Vitality</h3>
+      <ul>
+        <li>24mo: <b>$180/mo</b></li>
+        <li>12mo: <b>$203/mo</b></li>
+        <li>Plus AIA Vitality subscription (separate): <b>$96/yr</b> or <b>$8/mo</b></li>
+        <li>True all-in cost ≈ <b>$188/mo</b> (24mo) or <b>$211/mo</b> (12mo)</li>
+      </ul>
+      <h3>Prudential / Manulife / AIA (no Vitality) / AIG</h3>
+      <ul><li>12mo: <b>$205/mo</b></li></ul>
+      <h3>Corporate Partnership &amp; Great Eastern</h3>
+      <ul><li>12mo: <b>$214/mo</b></li></ul>
+    </div>
+
+    <div class="note-section">
+      <h2>PT sign-up promo (universal)</h2>
+      <p>Works with any plan above. Buying a PT package unlocks <b>30 days free</b> membership:</p>
+      <ul>
+        <li>3x PT sessions (45min) — <b>$199</b></li>
+        <li>6x PT sessions (45min) — <b>$349</b></li>
+        <li>Welcome Gift — Tote Bag (comes with any sign-up, not PT-specific)</li>
+        <li>Stacks with the 14 Days Free (sign up by 30 Sept 2026) promo</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Current promo offer — ends 30 Sept 2026</h2>
+      <h3>Option 1 — Monthly Plan</h3>
+      <p>Min. 12mo @ <b>$225/mo</b>, combinable with the PT promo (30 days free) and 14-day sign-up promo.</p>
+      <h3>Option 2 — Lumpsum (12+3 Free)</h3>
+      <p><b>$2,700</b> for 15 months → <b>$180/mo</b></p>
+      <h3>Option 3 — Half-Year Lumpsum (6+1 Free)</h3>
+      <p><b>$1,350</b> for 7 months → <b>$192.85/mo</b> (subject to approval)</p>
+    </div>
+
+    <div class="note-section">
+      <h2>AIA Vitality — gym promo months</h2>
+      <ul>
+        <li>Sept: <b>Free</b></li>
+        <li>Oct / Nov: <b>$95</b> — standalone promo, 1 month free on a 12mo plan or 2 months on a 24mo plan</li>
+        <li>Vitality subscription fee of $8/mo still applies on top, separately</li>
+      </ul>
+      <div class="warncallout">Cannot be stacked with the 30-day (PT) or 14-day sign-up promos.</div>
+      <p>Promo confirmed to end this month (30 Sept 2026).</p>
+    </div>
+
+    <div class="note-section">
+      <h2>Additional perks</h2>
+      <ul>
+        <li>After 6 months: <b>20 free weekend passes</b> for friends</li>
+        <li>Birthday month: <b>1 free 30-day pass</b> for a friend — can start anytime within that month. Not usable by the member themselves.</li>
+        <li>Couples: only <b>one Vitality subscription</b> needed for husband &amp; wife</li>
+        <li>By left, "fiancé(e)" works too 😉 — can use/works for one Vitality subscription and the lumpsum family add-on</li>
+        <li>For all those TFX "by left" perks you enjoyed — print ticket, call to book class — please work with your consultant</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Other packages on file</h2>
+      <ul>
+        <li>Lumpsum family add-on: $2,400 / 15 months</li>
+        <li>Lumpsum (Paragon only): $2,520 — duration not specified</li>
+        <li>Referral: 1 month at 50% off</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Locker rental</h2>
+      <p>Two sizes, two pricing tiers.</p>
+      <h3>With 6-month minimum commitment (MB)</h3>
+      <ul>
+        <li>Small: <b>$24/mo</b></li>
+        <li>Large: <b>$33/mo</b></li>
+      </ul>
+      <h3>No minimum commitment</h3>
+      <ul>
+        <li>Small: <b>$28/mo</b></li>
+        <li>Large: <b>$39/mo</b></li>
+      </ul>
+      <p>Deposit: <b>$36</b> (compulsory, refunded once the 6-month minimum term is met)</p>
+    </div>
+
+    <div class="note-section">
+      <h2>Freeze / pause</h2>
+      <ul>
+        <li>$31/mo, covers the whole calendar month</li>
+        <li>No proof needed — up to 12 times</li>
+        <li>Medical freeze (doctor's memo) → $31 waived</li>
+        <li>Inform staff before the 25th of the prior month</li>
+        <li>Freezing <b>extends</b> your contract — e.g. freeze 2 months on a 24-month plan → contract becomes 26 months</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Classes &amp; facilities</h2>
+      <h3>Steam / Sauna</h3>
+      <p>One Raffles Quay · One George St · 100AM</p>
+      <h3>Swimming pool (6 outlets)</h3>
+      <p>West Gate · Fusionopolis · Capital Tower · One George Street · 100AM (shared w/ hotel) · Amara Hotel</p>
+      <h3>Attire</h3>
+      <p>Provided at all outlets except Tampines and Junction 10</p>
+      <h3>Reformer classes — Bugis outlet only</h3>
+      <ul>
+        <li>1 class: $35 (valid 7 days)</li>
+        <li>5 classes: $150 (valid 45 days)</li>
+        <li>10 classes: $250 (valid 120 days)</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <h2>Class booking rules</h2>
+      <ul>
+        <li>Cancellation window: up to 2 hours before class time</li>
+        <li>Waiting list shown in-app</li>
+        <li>If pulled off waiting list, cancel within 30 min of class start time</li>
+        <li>Penalty: booking suspension after 4 no-shows/late-cancels within a 30-day cycle</li>
+        <li>Instructor's contact can check you in, or call front counter to check in</li>
+      </ul>
+      <div class="callout">Cheat code: if running late, just arrive within class timing and check in at the front counter — this clocks you in too.</div>
+    </div>
+
+    <div class="note-section">
+      <h2>Open questions</h2>
+      <ul class="qa">
+        <li>Does the Prudential rate confirm at $205 or $214? Sources conflict — one groups it with Great Eastern at $214, another with AIA/Manulife/AIG at $205.</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ---------- Nav ----------
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    window.scrollTo(0,0);
+  });
+});
+
+// ---------- Calculator ----------
+const state = {
+  route: 'monthly',
+  tier: 'standard-12',
+  vitalitySub: true,
+  ptEnabled: false,
+  ptAmount: 199,
+  promo14: false,
+  freezeMonths: 0,
+  lockerEnabled: false,
+  lockerSize: 'small',
+  lockerTerm: 'mb',
+  lumpsum: '12-3'
+};
+
+const tiers = {
+  'standard-4':   { label: 'Standard — 4 months',  monthly: 250, months: 4,  vitality:false },
+  'standard-12':  { label: 'Standard — 12 months', monthly: 225, months: 12, vitality:false },
+  'standard-18':  { label: 'Standard — 18 months', monthly: 215, months: 18, vitality:false },
+  'standard-24':  { label: 'Standard — 24 months', monthly: 205, months: 24, vitality:false },
+  'corp-ge':      { label: 'Corporate Partnership / Great Eastern — 12mo', monthly: 214, months: 12, vitality:false },
+  'insurer-205':  { label: 'Prudential / Manulife / AIA (no Vitality) / AIG / NTUC Income — 12mo', monthly: 205, months: 12, vitality:false },
+  'vitality-12':  { label: 'AIA with Vitality — 12mo', monthly: 203, months: 12, vitality:true },
+  'vitality-24':  { label: 'AIA with Vitality — 24mo', monthly: 180, months: 24, vitality:true },
+};
+
+const lumpsumPlans = {
+  '6-1':      { label: 'Lumpsum — 6+1 months free', total: 1350, months: 7 },
+  '12-3':     { label: 'Lumpsum — 12+3 months free', total: 2700, months: 15 },
+  'family':   { label: 'Lumpsum family add-on', total: 2400, months: 15 },
+  'paragon':  { label: 'Lumpsum — Paragon outlet only', total: 2520, months: null },
+};
+
+const lockerRates = {
+  small: { mb: 24, nomb: 28 },
+  large: { mb: 33, nomb: 39 },
+};
+const LOCKER_DEPOSIT = 36;
+
+const VITALITY_SUB_MONTHLY = 8;
+const FREEZE_FEE = 31;
+
+function fmt(n){
+  return '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+}
+
+function render(){
+  const breakdown = document.getElementById('breakdown');
+  const label = document.getElementById('result-label');
+  const monthlyOut = document.getElementById('result-monthly');
+  const commitTotal = document.getElementById('commit-total');
+  const flagBox = document.getElementById('flag-box');
+  breakdown.innerHTML = '';
+  flagBox.style.display = 'none';
+
+  if(state.route === 'monthly'){
+    const tier = tiers[state.tier];
+    let total = tier.monthly;
+    label.textContent = tier.label;
+
+    let rows = [`<div class="row"><span>Gym membership</span><span>${fmt(tier.monthly)}</span></div>`];
+
+    if(tier.vitality && state.vitalitySub){
+      total += VITALITY_SUB_MONTHLY;
+      rows.push(`<div class="row"><span>AIA Vitality subscription</span><span>${fmt(VITALITY_SUB_MONTHLY)}</span></div>`);
+    }
+    if(state.lockerEnabled){
+      const lockerMonthly = lockerRates[state.lockerSize][state.lockerTerm];
+      total += lockerMonthly;
+      rows.push(`<div class="row"><span>Locker rental (${state.lockerSize})</span><span>${fmt(lockerMonthly)}</span></div>`);
+    }
+
+    rows.push(`<div class="row total"><span>Total per month</span><span>${fmt(total)}</span></div>`);
+    breakdown.innerHTML = rows.join('');
+    monthlyOut.textContent = fmt(total);
+
+    const bonusFromPT = state.ptEnabled ? 1 : 0;
+    const bonusFrom14 = state.promo14 ? 0.5 : 0; // 14 days ≈ 0.5 month, shown separately below
+    const totalTenure = tier.months + bonusFromPT + state.freezeMonths;
+    const fullCommitCost = total * tier.months;
+    let grandTotal = fullCommitCost;
+
+    let commitLines = [];
+    commitLines.push(`<div class="row"><span>Membership fees (${tier.months} mo committed)</span><span>${fmt(fullCommitCost)}</span></div>`);
+
+    if(state.ptEnabled){
+      grandTotal += state.ptAmount;
+      commitLines.push(`<div class="row"><span>PT sessions (one-time)</span><span>${fmt(state.ptAmount)}</span></div>`);
+      commitLines.push(`<div class="row"><span>Bonus tenure from PT sign-up</span><span>+1 month free</span></div>`);
+    }
+    if(state.promo14){
+      commitLines.push(`<div class="row"><span>Sign-up bonus (by 30 Sept)</span><span>+14 days free</span></div>`);
+    }
+    if(state.freezeMonths > 0){
+      const freezeCost = state.freezeMonths * FREEZE_FEE;
+      grandTotal += freezeCost;
+      commitLines.push(`<div class="row"><span>Freeze fees (${state.freezeMonths} mo)</span><span>${fmt(freezeCost)}</span></div>`);
+      commitLines.push(`<div class="row"><span>Contract extension from freeze</span><span>+${state.freezeMonths} month${state.freezeMonths>1?'s':''}</span></div>`);
+    }
+    if(state.lockerEnabled){
+      grandTotal += LOCKER_DEPOSIT;
+      commitLines.push(`<div class="row"><span>Locker deposit (one-time, refundable)</span><span>${fmt(LOCKER_DEPOSIT)}</span></div>`);
+    }
+    commitLines.push(`<div class="row total"><span>Total contract span</span><span>${totalTenure} month${totalTenure!==1?'s':''}${state.promo14?' + 14 days':''}</span></div>`);
+    commitLines.push(`<div class="row total"><span>Grand total paid</span><span>${fmt(grandTotal)}</span></div>`);
+    commitTotal.innerHTML = commitLines.join('');
+
+    if(tier.vitality && !state.vitalitySub){
+      flagBox.style.display = 'block';
+      flagBox.textContent = 'Vitality subscription is required to qualify for this rate — turning it off is for comparison only.';
+    }
+
+  } else {
+    const plan = lumpsumPlans[state.lumpsum];
+    label.textContent = plan.label;
+    const perMonth = plan.months ? (plan.total / plan.months) : null;
+
+    let rows = [`<div class="row"><span>Total upfront</span><span>${fmt(plan.total)}</span></div>`];
+    if(plan.months){
+      rows.push(`<div class="row"><span>Membership duration</span><span>${plan.months} months</span></div>`);
+      rows.push(`<div class="row total"><span>Effective per month</span><span>${fmt(perMonth)}</span></div>`);
+    } else {
+      rows.push(`<div class="row total"><span>Duration</span><span>Not specified</span></div>`);
+    }
+    breakdown.innerHTML = rows.join('');
+    monthlyOut.textContent = perMonth ? fmt(perMonth) : fmt(plan.total);
+
+    commitTotal.innerHTML = `<div class="row total"><span>Paid upfront</span><span>${fmt(plan.total)}</span></div>`;
+
+    if(state.lumpsum === 'paragon'){
+      flagBox.style.display = 'block';
+      flagBox.textContent = 'Duration for this package wasn\'t noted — confirm months covered before paying.';
+    }
+  }
+}
+
+document.getElementById('route-pills').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  state.route = btn.dataset.route;
+  document.querySelectorAll('#route-pills .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('monthly-controls').style.display = state.route === 'monthly' ? 'block' : 'none';
+  document.getElementById('lumpsum-controls').style.display = state.route === 'lumpsum' ? 'block' : 'none';
+  render();
+});
+
+document.getElementById('tier-select').addEventListener('change', (e) => {
+  state.tier = e.target.value;
+  const tier = tiers[state.tier];
+  document.getElementById('vitality-toggle-group').style.display = tier.vitality ? 'block' : 'none';
+  render();
+});
+
+document.getElementById('vitality-toggle').addEventListener('change', (e) => {
+  state.vitalitySub = e.target.checked;
+  render();
+});
+
+document.getElementById('pt-toggle').addEventListener('change', (e) => {
+  state.ptEnabled = e.target.checked;
+  document.getElementById('pt-options').style.display = state.ptEnabled ? 'block' : 'none';
+  render();
+});
+
+document.getElementById('pt-options').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  state.ptAmount = parseInt(btn.dataset.pt, 10);
+  document.querySelectorAll('#pt-options .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+});
+
+document.getElementById('promo14-toggle').addEventListener('change', (e) => {
+  state.promo14 = e.target.checked;
+  render();
+});
+
+document.getElementById('freeze-plus').addEventListener('click', () => {
+  if(state.freezeMonths < 12){ state.freezeMonths++; document.getElementById('freeze-count').textContent = state.freezeMonths; render(); }
+});
+document.getElementById('freeze-minus').addEventListener('click', () => {
+  if(state.freezeMonths > 0){ state.freezeMonths--; document.getElementById('freeze-count').textContent = state.freezeMonths; render(); }
+});
+
+document.getElementById('locker-toggle').addEventListener('change', (e) => {
+  state.lockerEnabled = e.target.checked;
+  document.getElementById('locker-options').style.display = state.lockerEnabled ? 'block' : 'none';
+  render();
+});
+document.getElementById('locker-size').addEventListener('change', (e) => {
+  state.lockerSize = e.target.value;
+  render();
+});
+document.getElementById('locker-term').addEventListener('change', (e) => {
+  state.lockerTerm = e.target.value;
+  render();
+});
+
+document.getElementById('lumpsum-select').addEventListener('change', (e) => {
+  state.lumpsum = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
